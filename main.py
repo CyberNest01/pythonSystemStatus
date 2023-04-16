@@ -16,8 +16,9 @@ def os_information():
 
 def cpu():
     context = {}
-    context['cpu_avg'] = os.getloadavg()
-    print(context['cpu_avg'])
+    context['cpu_avg_1min'] = os.getloadavg()[0]
+    context['cpu_avg_5min'] = os.getloadavg()[1]
+    context['cpu_avg_15min'] = os.getloadavg()[2]
     context['cpu_information'] = subprocess.check_output("lscpu", shell=True).strip().decode()
     return context
 
@@ -26,8 +27,6 @@ def memory_information():
     context = {}
     context['memory'] = subprocess.check_output("vmstat -s", shell=True).strip().decode()
     context['ram_size'] = psutil.virtual_memory().total / 1024 / 1024 / 1024
-    context['ram_status'] = psutil.virtual_memory()
-    print(context['ram_status'])
     return context
 
 
@@ -36,8 +35,26 @@ def main():
     context.update(os_information())
     context.update(cpu())
     context.update(memory_information())
-    response = requests.post('https://stage.htop.ir', data=context)
+    context.update(ram_status_clear())
+    response = requests.post('https://stage.htop.ir/', data=context)
     print(response)
+
+
+def ram_status_clear():
+    context = {}
+    status = psutil.virtual_memory()
+    context['ram_status_total'] = status[0]
+    context['ram_status_available'] = status[1]
+    context['ram_status_percent'] = status[2]
+    context['ram_status_used'] = status[3]
+    context['ram_status_free'] = status[4]
+    context['ram_status_active'] = status[5]
+    context['ram_status_inactive'] = status[6]
+    context['ram_status_buffers'] = status[7]
+    context['ram_status_cached'] = status[8]
+    context['ram_status_shared'] = status[9]
+    context['ram_status_slab'] = status[10]
+    return context
 
 
 main()
