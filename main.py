@@ -1,13 +1,14 @@
 import os
 import subprocess
 import psutil
+import platform
 import requests
 
 
 def os_information():
     context = {}
     context['host_name'] = subprocess.check_output("hostname -I", shell=True).strip().decode()
-    context['linux'] = subprocess.check_output("uname -v", shell=True).strip().decode().split('~')[1]
+    context['linux'] = platform.version()
     context['uptime'] = subprocess.check_output("uptime", shell=True).strip().decode()
     context['kernel'] = subprocess.check_output("uname -r", shell=True).strip().decode()
     context['bash_version'] = subprocess.check_output("bash --version", shell=True).strip().decode().split('\nCopyright')[0]
